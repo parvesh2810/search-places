@@ -4,7 +4,6 @@ import burger2 from './assets/burger2.png';
 import fanta from './assets/Fanta.png';
 import bill from './assets/bill.svg';
 import maps from './assets/maps.svg';
-import './App.css';
 
 function App() {
   //All the below sections can be broken into child components as we are using react 
