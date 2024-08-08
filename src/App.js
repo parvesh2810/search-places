@@ -23,11 +23,12 @@ function App() {
       method: 'GET',
       url: `https://wft-geo-db.p.rapidapi.com/v1/geo/cities`,
       params: {
-        namePrefix: searchText,
+        namePrefix: searchText, //This I have to google as didn't know what was the name of param for search
         limit: perPage,
         offset: (currentPage - 1) * perPage, // Pagination calculation
       },
       headers: {
+        // Getting the keys and endpoints from .env.local file for Production it should be .env.production
         'x-rapidapi-key': process.env.REACT_APP_RAPID_KEY, // get your key from https://rapidapi.com/wirefreethought/api/geodb-cities
         'x-rapidapi-host': process.env.REACT_APP_RAPID_HOST,
       },
@@ -45,6 +46,7 @@ function App() {
     }
   };
 
+  //Default data fetched by API is 5 and max it can fetch 10 items and user should be limited and some kind of warning should be given if user enters input above 10.
   const handleLimitChange = (e) => {
     const value = parseInt(e.target.value, 10);
     if (value > 10) {
@@ -57,10 +59,10 @@ function App() {
     }
   };
 
+  //Keyboard Shortcut for Focus on Searchbar
   useEffect(() => {
     const handleKeyDown = (event) => {
-      // Check if the key combination is CTRL/CMD + /
-      if ((event.ctrlKey || event.metaKey) && event.key === '/') {
+      if (event.ctrlKey && event.key === '/') {
         event.preventDefault();
         if (searchBoxRef.current) {
           searchBoxRef.current.focus();
@@ -69,7 +71,6 @@ function App() {
     };
 
     document.addEventListener('keydown', handleKeyDown);
-    // Clean up event listener on component unmount
     return () => {
       document.removeEventListener('keydown', handleKeyDown);
     };
@@ -118,37 +119,41 @@ function App() {
         min='1'
         max='10'
       />
-      {loading && <div className='loader'></div>}
-      <table>
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>Place Name</th>
-            <th>Country</th>
-          </tr>
-        </thead>
-        <tbody>
-          {cities.length === 0 && !loading ? (
+      {loading ? (
+        <div className='loader'></div>
+      ) : (
+        <table>
+          <thead>
             <tr>
-              <td colSpan='3'>No result found</td>
+              <th>#</th>
+              <th>Place Name</th>
+              <th>Country</th>
             </tr>
-          ) : (
-            cities.map((city, index) => (
-              <tr key={city.id}>
-                <td>{index + 1}</td>
-                <td>{city.name}</td>
-                <td>
-                  {city.country}{' '}
-                  <img
-                    src={`${process.env.REACT_APP_FLAGS_ENDPOINT}${city.countryCode}/flat/32.png`}
-                    alt={city.country}
-                  />
-                </td>
+          </thead>
+          <tbody>
+            {cities.length === 0 && !loading ? (
+              <tr>
+                <td colSpan='3'>No result found</td>
               </tr>
-            ))
-          )}
-        </tbody>
-      </table>
+            ) : (
+              cities.map((city, index) => (
+                <tr key={city.id}>
+                  <td>{index + 1}</td>
+                  <td>{city.name}</td>
+                  <td>
+                    {city.country}{' '}
+                    <img
+                      src={`${process.env.REACT_APP_FLAGS_ENDPOINT}${city.countryCode}/flat/32.png`}
+                      alt={city.country}
+                    />
+                  </td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      )}
+
       {/* Added Pagination with SearchText as there were 70000 records and Pagination can work more stable with if user has searched */}
       {totalPages > 1 && searchText && (
         <div className='pagination'>
